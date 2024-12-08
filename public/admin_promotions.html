@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Khuyến Mãi</title>
+</head>
+<body>
+  <h1>Đăng Khuyến Mãi</h1>
+  <form action="/admin/promotions" method="POST">
+    <label for="title">Tiêu đề:</label>
+    <input type="text" id="title" name="title" required><br>
+
+    <label for="description">Mô tả:</label>
+    <textarea id="description" name="description" required></textarea><br>
+
+    <label for="start_date">Ngày bắt đầu:</label>
+    <input type="datetime-local" id="start_date" name="start_date" required><br>
+
+    <label for="end_date">Ngày kết thúc:</label>
+    <input type="datetime-local" id="end_date" name="end_date" required><br>
+
+    <button type="submit">Đăng</button>
+  </form>
+</body>
+</html>
