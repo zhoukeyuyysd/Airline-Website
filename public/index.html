@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airline Booking System</title>
+  <link rel="stylesheet" href="css/style.css"> <!-- Link tới file CSS -->
+</head>
+<body>
+
+  <!-- Thanh Menu Ngang -->
+  <nav>
+    <ul>
+      <li><a href="#" data-page="ticket.html">Ve</a></li>
+      <li><a href="#" data-page="promotion.html">Khuyen Mai</a></li>
+      <li><a href="#" data-page="order.html">Don Hang</a></li>
+      <li><a href="#" data-page="support.html">Ho Tro</a></li>
+      <li><a href="#" data-page="login.html">Dang Nhap</a></li>
+      <li><a href="#" data-page="register.html">Dang Ky</a></li>
+    </ul>
+  </nav>
+
+  <!-- Nội dung trang chính (sẽ được tải động) -->
+  <div id="content">
+    <h1>Welcome to the Airline Booking System</h1>
+    <p>Explore flight tickets, promotions, and more!</p>
+  </div>
+
+  <script>
+    // Lắng nghe sự kiện click trên các menu
+    const menuLinks = document.querySelectorAll("nav ul li a");
+
+    // Lặp qua tất cả các liên kết trong menu
+    menuLinks.forEach(link => {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();  // Ngăn chặn hành động mặc định (chuyển trang)
+
+        const page = this.getAttribute("data-page");  // Lấy tên trang cần tải
+
+        // Gọi hàm loadPage để tải nội dung của trang
+        loadPage(page);
+      });
+    });
+
+    // Hàm để tải nội dung trang vào phần #content
+    function loadPage(page) {
+      // Tạo đối tượng XMLHttpRequest để tải trang
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", page, true);
+
+      // Khi tải xong trang, thay thế nội dung phần #content
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          document.getElementById("content").innerHTML = xhr.responseText;
+        } else {
+          document.getElementById("content").innerHTML = "<h3>Error loading page</h3>";
+        }
+      };
+
+      // Gửi yêu cầu tải trang
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
