@@ -1,0 +1,25 @@
+/airline-booking
+    /public
+        /css
+            - style.css
+        - home.html
+        - ticket.html
+        - promotion.html
+        - order.html
+        - support.html
+        - register.html
+    /config
+        - db.js
+    /models
+        - locationModel.js
+        - ticketTypeModel.js
+        - flightModel.js
+        - orderModel.js
+        - userModel.js
+    /routes
+        - flightRoutes.js
+    /utils
+        -loadData.js //nhap data chay node utils/loadData.js
+        -clearData.ks
+    - server.js
+    - package.json
