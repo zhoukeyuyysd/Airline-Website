@@ -2,10 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createPromotion } = require('../models/promotionModel'); 
 
-// Route hiển thị trang đăng khuyến mãi (admin)
-router.get('/promotions', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'admin_promotions.html'));
-});
+
 
 // Route xử lý đăng bài khuyến mãi
 router.post('/promotions', async (req, res) => {

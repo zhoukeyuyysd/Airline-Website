@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { createUser, getOneUserByName } = require('../models/userModel'); 
+const { getAllPromotions } = require('../models/promotionModel');
+
 
 // Middleware kiểm tra dữ liệu đầu vào cho đăng ký
 function validateRegisterData(req, res, next) {
@@ -78,6 +80,17 @@ async function authenticateUser(req, res, next) {
 // Route đăng nhập người dùng
 router.post('/login', authenticateUser, (req, res) => {
   res.status(200).json({ message: 'Đăng nhập thành công', user: req.session.user });
+});
+
+// API để lấy tất cả các khuyến mãi
+router.get('/promotions', async (req, res) => {
+  try {
+    const promotions = await getAllPromotions();  // Lấy tất cả các khuyến mãi
+    res.status(200).json(promotions);  // Trả về kết quả dưới dạng JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Lỗi khi lấy danh sách khuyến mãi.' });
+  }
 });
 
 // Route đăng xuất
