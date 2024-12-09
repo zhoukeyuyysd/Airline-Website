@@ -38,6 +38,16 @@ app.get('/register', (req, res) => {
 app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'home.html'));
   });
+//Route trả về trang promotion
+app.get('/promotions', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'promotions.html'));
+});
+
+// Route hiển thị trang đăng khuyến mãi (admin)
+app.get('/admin/promotions', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin_promotions.html'));
+});
+
   
 
 // Đăng ký các route
@@ -72,17 +82,25 @@ const port = 3000;
     console.log('Database connected and default admin created!');
   })();
   
-  
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
+ // Khởi tạo server và lưu đối tượng server vào biến
+const server = app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
 
-// Lắng nghe tín hiệu SIGINT (Ctrl+C) và xóa dữ liệu trước khi dừng server
+// Lắng nghe tín hiệu SIGINT để dọn dẹp dữ liệu và đóng server
 process.on('SIGINT', async () => {
-    console.log('Received SIGINT. Clearing data and shutting down...');
+  console.log('Received SIGINT. Clearing data and shutting down...');
+  
+  try {
     await clearData();  // Gọi hàm xóa dữ liệu
     server.close(() => {
-      console.log('Server stopped.');
-      process.exit(0); 
+      console.log('Server closed.');
+      process.exit(0);  // Thoát chương trình bình thường
     });
-  });
+  } catch (error) {
+    console.error('Error clearing data:', error);
+    server.close(() => {
+      process.exit(1);  // Thoát chương trình với mã lỗi nếu có lỗi
+    });
+  }
+});

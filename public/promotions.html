@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khuyến Mãi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+    .promotion-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+    }
+    .promotion-card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
+    }
+    .promotion-card h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .promotion-card p {
+      font-size: 16px;
+      color: #555;
+    }
+    .promotion-card .status {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .promotion-card .dates {
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Khuyến Mãi</h1>
+  </header>
+
+  <div class="promotion-container" id="promotion-container">
+    <!-- Danh sách khuyến mãi sẽ được hiển thị ở đây -->
+  </div>
+
+  <script>
+    // Lấy dữ liệu từ API và hiển thị tất cả khuyến mãi
+    async function loadPromotions() {
+      try {
+        // Gọi API để lấy danh sách khuyến mãi
+        const response = await fetch('/api/users/promotions');
+        const promotions = await response.json();
+
+        // Kiểm tra nếu không có khuyến mãi nào
+        if (!promotions || Object.keys(promotions).length === 0) {
+          document.getElementById('promotion-container').innerHTML = '<p>Hiện tại không có khuyến mãi nào.</p>';
+          return;
+        }
+
+        // Chuyển đổi đối tượng thành mảng để dễ dàng duyệt qua
+        const promotionsArray = Object.values(promotions);
+
+        // Lấy container để hiển thị dữ liệu
+        const container = document.getElementById('promotion-container');
+
+        // Lặp qua các khuyến mãi và tạo thẻ card cho mỗi khuyến mãi
+        promotionsArray.forEach(promotion => {
+          const card = document.createElement('div');
+          card.classList.add('promotion-card');
+          card.innerHTML = `
+            <h2>${promotion.title}</h2>
+            <p>${promotion.description}</p>
+            <p class="status">${promotion.status}</p>
+            <p class="dates">
+              <strong>Thời gian:</strong> ${new Date(promotion.start_date).toLocaleDateString()} - ${new Date(promotion.end_date).toLocaleDateString()}
+            </p>
+          `;
+          
+          // Thêm card vào container
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu khuyến mãi:', error);
+        document.getElementById('promotion-container').innerHTML = '<p>Không thể tải dữ liệu khuyến mãi.</p>';
+      }
+    }
+
+    // Gọi hàm loadPromotions khi trang được tải
+    window.onload = loadPromotions;
+  </script>
+</body>
+</html>
