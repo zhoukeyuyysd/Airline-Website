@@ -3,6 +3,8 @@ const session = require('express-session');
 
 const app = express();
 const path = require('path');
+const cors = require('cors');
+
 const { createDefaultAdmin } = require('./models/userModel');
 const flightRoutes = require('./routes/flightRoutes');
 const userRoutes = require('./routes/userRoutes');   // Thêm route người dùng
@@ -12,15 +14,15 @@ const { connectDB } = require('./config/db');
 const { clearData } = require('./utils/clearData');  // Thêm clearData
 
 // Middleware để parse JSON
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json());  
+app.use(express.urlencoded({ extended: true })); 
 
 // Cấu hình Express để phục vụ các tệp tĩnh từ thư mục public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Cấu hình session
 app.use(session({
-  secret: 'your_secret_key',  
+  secret: 'your_secret_key',
   resave: false,
   saveUninitialized: true
 }));
@@ -28,6 +30,11 @@ app.use(session({
 // Route trả về trang login (login.html)
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Route để hiển thị trang order.html
+app.get('/order', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'order.html'));
 });
 
 

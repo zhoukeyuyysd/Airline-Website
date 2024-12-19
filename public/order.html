@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giỏ Hàng</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .flight-item {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .flight-item select {
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Chọn Chuyến Bay</h1>
+
+  <div id="flights-list">
+    <p>Đang tải chuyến bay...</p>
+  </div>
+
+  <h2>Giỏ Hàng</h2>
+  <div id="cart-list">
+    <p>Giỏ hàng của bạn hiện tại trống.</p>
+  </div>
+
+  <script>
+    // Hàm gọi API để lấy danh sách các chuyến bay và giá vé
+    async function fetchFlights() {
+      try {
+        const response = await fetch('/api/prices');
+        const data = await response.json();
+
+        if (response.ok) {
+          const flightsList = document.getElementById('flights-list');
+          flightsList.innerHTML = '';  // Xóa thông báo "Đang tải"
+
+          // Duyệt qua các chuyến bay và hiển thị
+          Object.values(data).forEach(flight => {
+            const flightDiv = document.createElement('div');
+            flightDiv.classList.add('flight-item');
+
+            flightDiv.innerHTML = `
+              <p><strong>Chuyến bay ID:</strong> ${flight.flight_id}</p>
+              <p><strong>Loại vé ID:</strong> ${flight.ticket_type_id}</p>
+              <p><strong>Giá:</strong> ${flight.price} VND</p>
+              <label for="quantity">Số lượng:</label>
+              <input type="number" id="quantity-${flight.id}" name="quantity" min="1" value="1">
+              <button onclick="addToCart(${flight.flight_id}, ${flight.ticket_type_id}, ${flight.id})">Thêm vào giỏ hàng</button>
+            `;
+
+            flightsList.appendChild(flightDiv);
+          });
+        } else {
+          document.getElementById('flights-list').innerHTML = 'Lỗi khi tải chuyến bay.';
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải chuyến bay:', error);
+        document.getElementById('flights-list').innerHTML = 'Lỗi khi tải chuyến bay.';
+      }
+    }
+
+    // Hàm thêm chuyến bay vào giỏ hàng
+    async function addToCart(flightId, ticketTypeId, priceId) {
+      const quantity = document.getElementById(`quantity-${priceId}`).value;
+      
+      // Gửi yêu cầu thêm item vào giỏ hàng
+      try {
+        const response = await fetch('/api/users/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            flightId: flightId,
+            ticketTypeId: ticketTypeId,
+            quantity: quantity
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message);
+          fetchCart(); // Cập nhật lại giỏ hàng
+        } else {
+          alert(data.message || 'Lỗi khi thêm vào giỏ hàng');
+        }
+      } catch (error) {
+        console.error('Lỗi khi thêm vào giỏ hàng:', error);
+        alert('Lỗi khi thêm vào giỏ hàng');
+      }
+    }
+
+    // Hàm lấy giỏ hàng
+    async function fetchCart() {
+      try {
+        const response = await fetch('/api/users/cart');
+        const data = await response.json();
+
+        if (response.ok) {
+          const cartList = document.getElementById('cart-list');
+          cartList.innerHTML = '';  // Xóa thông báo "Giỏ hàng trống"
+
+          if (data.cart && data.cart.length > 0) {
+            // Duyệt qua giỏ hàng và hiển thị từng item
+            data.cart.forEach(item => {
+              const cartItemDiv = document.createElement('div');
+              cartItemDiv.classList.add('flight-item');
+              cartItemDiv.innerHTML = `
+                <p><strong>Chuyến bay ID:</strong> ${item.flightId}</p>
+                <p><strong>Loại vé ID:</strong> ${item.ticketTypeId}</p>
+                <p><strong>Số lượng:</strong> ${item.quantity}</p>
+                <p><strong>Giá:</strong> ${item.price} VND</p>
+                <button onclick="removeFromCart(${item.flightId}, ${item.ticketTypeId})">Xóa khỏi giỏ hàng</button>
+              `;
+              cartList.appendChild(cartItemDiv);
+            });
+          } else {
+            cartList.innerHTML = 'Giỏ hàng của bạn hiện tại trống.';
+          }
+        } else {
+          document.getElementById('cart-list').innerHTML = 'Lỗi khi tải giỏ hàng.';
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải giỏ hàng:', error);
+        document.getElementById('cart-list').innerHTML = 'Lỗi khi tải giỏ hàng.';
+      }
+    }
+
+    // Hàm xóa item khỏi giỏ hàng
+    async function removeFromCart(flightId, ticketTypeId) {
+      try {
+        const response = await fetch('/api/users/cart', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            flightId: flightId,
+            ticketTypeId: ticketTypeId
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message);
+          fetchCart(); // Cập nhật lại giỏ hàng
+        } else {
+          alert(data.message || 'Lỗi khi xóa khỏi giỏ hàng');
+        }
+      } catch (error) {
+        console.error('Lỗi khi xóa khỏi giỏ hàng:', error);
+        alert('Lỗi khi xóa khỏi giỏ hàng');
+      }
+    }
+
+    // Gọi hàm fetchFlights khi trang được tải
+    fetchFlights();
+    fetchCart();  // Cập nhật giỏ hàng khi tải trang
+  </script>
+
+</body>
+</html>
